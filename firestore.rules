@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidPortfolioData(data) {
+      return data is map &&
+             data.keys().hasAny(['hero', 'competitions', 'projects', 'skills', 'awards', 'externalLinks', 'profile', 'updatedAt']);
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Portfolio collection
+    match /portfolio/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId) && isValidPortfolioData(request.resource.data);
+    }
+  }
+}

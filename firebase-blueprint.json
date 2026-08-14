@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "PortfolioConfig": {
+      "title": "Portfolio Configuration",
+      "description": "Entire portfolio dynamic data including hero, competitions, projects, skills, awards, external links and profile info",
+      "type": "object",
+      "properties": {
+        "hero": {
+          "type": "object",
+          "description": "Hero section content, badges and images"
+        },
+        "competitions": {
+          "type": "array",
+          "description": "List of competition timeline entries with images and external links"
+        },
+        "projects": {
+          "type": "array",
+          "description": "List of featured robotics projects with specs, code and image links"
+        },
+        "skills": {
+          "type": "array",
+          "description": "List of technical and soft skills"
+        },
+        "awards": {
+          "type": "array",
+          "description": "List of official awards, certificates and link references"
+        },
+        "externalLinks": {
+          "type": "array",
+          "description": "Custom external links and social channels"
+        },
+        "profile": {
+          "type": "object",
+          "description": "Personal profile information and student statement"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of last modification"
+        }
+      },
+      "required": ["updatedAt"]
+    }
+  },
+  "firestore": {
+    "/portfolio/data": {
+      "schema": "PortfolioConfig",
+      "description": "Master document storing user's dynamic portfolio data, images and external links"
+    }
+  }
+}

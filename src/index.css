@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-primary: #7864f6;
+    --brand-primary-hover: #6550e8;
+    --brand-light: #f4f2fe;
+    --brand-border: #ded8fd;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', 'Noto Sans KR', sans-serif;
+    background-color: #ffffff;
+    color: #1e293b;
+  }
+  
+  h1, h2, h3, .font-display {
+    font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  }
+
+  .font-serif-heading {
+    font-family: 'Playfair Display', 'Noto Sans KR', Georgia, serif;
+  }
+
+  .font-code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom theme color utility classes */
+.bg-brand {
+  background-color: #7864f6;
+}
+.bg-brand-hover:hover {
+  background-color: #6550e8;
+}
+.text-brand {
+  color: #7864f6;
+}
+.border-brand {
+  border-color: #7864f6;
+}
+.bg-brand-light {
+  background-color: #f6f4ff;
+}
+.border-brand-light {
+  border-color: #e5e0fd;
+}
+.ring-brand {
+  --tw-ring-color: #7864f6;
+}
+
+/* Dotted grid background for banner */
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.3) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+.bg-dot-pattern-brand {
+  background-image: radial-gradient(rgba(120, 100, 246, 0.22) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+
+/* Glow effects */
+.glow-brand {
+  box-shadow: 0 10px 30px -8px rgba(120, 100, 246, 0.45);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+::-webkit-scrollbar-thumb {
+  background: #dcd8fc;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7864f6;
+}
