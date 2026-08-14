@@ -34,7 +34,7 @@ export const HardwareSpecsModal: React.FC<HardwareSpecsModalProps> = ({ isOpen, 
           </div>
 
           <h3 className="text-2xl font-extrabold font-['Outfit']">
-            V5 Pro 하드웨어 아키텍처
+            자율주행 로봇 하드웨어 아키텍처
           </h3>
           <p className="text-xs text-slate-400 mt-1">
             국내 및 국제 대회 출전을 위해 최적화된 로봇 시스템 사양
@@ -50,9 +50,9 @@ export const HardwareSpecsModal: React.FC<HardwareSpecsModalProps> = ({ isOpen, 
                 메인 프로세서
               </div>
               <div className="text-sm font-extrabold text-slate-900 mt-1">
-                ARM Cortex-A9 듀얼
+                고성능 ARM 임베디드 코어
               </div>
-              <div className="text-[11px] text-slate-500">V5 Brain @ 667MHz</div>
+              <div className="text-[11px] text-slate-500">Pybricks &amp; MCU 듀얼 코어</div>
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-[#7864f6]/20">
@@ -63,7 +63,7 @@ export const HardwareSpecsModal: React.FC<HardwareSpecsModalProps> = ({ isOpen, 
               <div className="text-sm font-extrabold text-slate-900 mt-1">
                 3:1 초고속 세팅
               </div>
-              <div className="text-[11px] text-slate-500">블루 카트리지 (600 RPM)</div>
+              <div className="text-[11px] text-slate-500">정밀 유성 기어박스 (고속 세팅)</div>
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-[#7864f6]/20">

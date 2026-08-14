@@ -89,7 +89,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore, onOpenSpecs
                 </div>
                 <div className="flex items-center gap-2 text-slate-800 bg-[#7864f6]/5 p-2.5 rounded-xl border border-[#7864f6]/15">
                   <Wrench className="w-4 h-4 text-[#7864f6] shrink-0" />
-                  <span className="truncate">VEX V5 Pro</span>
+                  <span className="truncate">로봇 메커니즘 &amp; 제어</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-800 bg-[#7864f6]/5 p-2.5 rounded-xl border border-[#7864f6]/15">
                   <Code2 className="w-4 h-4 text-[#7864f6] shrink-0" />
@@ -149,7 +149,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore, onOpenSpecs
                 <div className="relative h-[380px] sm:h-[420px] w-full overflow-hidden">
                   <img
                     src={hero.heroImage}
-                    alt="VEX V5 고정밀 로봇 기어박스 조립체"
+                    alt="고정밀 로봇 기어박스 조립체"
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 brightness-95 contrast-105"
                   />
                   {/* Tech Overlay Grid */}
@@ -162,7 +162,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore, onOpenSpecs
                       실시간 시스템
                     </span>
                     <span className="px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-[11px] font-mono text-slate-300 border border-slate-700">
-                      VEX V5 PRO
+                      자율주행 시스템
                     </span>
                   </div>
 

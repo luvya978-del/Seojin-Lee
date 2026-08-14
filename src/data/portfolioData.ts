@@ -12,7 +12,7 @@ export const DEFAULT_EXTERNAL_LINKS: ExternalLinkItem[] = [
   },
   {
     id: "link-github-pybricks",
-    title: "Pybricks & V5 Pro 로봇 알고리즘 코드 (GitHub)",
+    title: "Pybricks 로봇 자율주행 알고리즘 코드 (GitHub)",
     url: "https://github.com",
     description: "PID 제어기 및 6축 자이로 오도메트리 오픈소스 저장소",
     category: "github",
@@ -21,7 +21,7 @@ export const DEFAULT_EXTERNAL_LINKS: ExternalLinkItem[] = [
   },
   {
     id: "link-onshape-cad",
-    title: "V5 Pro 로봇 차체 3D CAD 도면 (Onshape)",
+    title: "로봇 차체 3D CAD 도면 (Onshape)",
     url: "https://cad.onshape.com",
     description: "3:1 고속 기어박스 및 모듈형 그리퍼 3D 모델 뷰어",
     category: "cad",
@@ -42,13 +42,13 @@ export const DEFAULT_EXTERNAL_LINKS: ExternalLinkItem[] = [
 export const HERO_DATA: HeroData = {
   name: "이서진의",
   titleSuffix: "포트폴리오.",
-  badge: "V5 PRO / 로봇공학",
+  badge: "자율주행 / 로봇공학",
   studentBadge: "로봇공학 학생",
   tagline: "언제나 열심히 노력하자.",
   pastCompetitions: "2024 로보컵, 2026 로보컵, 2024 FLL, 2025 WRO, 2026 WRO",
   bulletPoints: [
     { icon: "GraduationCap", text: "로봇 공학 & 엔지니어링 학습" },
-    { icon: "Wrench", text: "VEX V5 Pro 개발자" },
+    { icon: "Wrench", text: "로봇 메커니즘 & 제어" },
     { icon: "Code2", text: "C++ & Python 프로그래밍" }
   ],
   currentGoal: "혁신적인 기구 메커니즘과 자율 알고리즘을 통해 실제 문제를 해결하는 로봇 시스템을 개발합니다.",
@@ -126,20 +126,20 @@ export const COMPETITIONS_DATA: CompetitionItem[] = [
     linkText: "미로 탐색 알고리즘"
   },
   {
-    id: "vex-2023",
-    year: "2023",
-    date: "2023년 12월",
-    category: "우수상 (Excellence Award)",
-    categoryType: "vex",
-    title: "VEX Robotics Competition",
-    team: "메인 빌더",
-    roles: ["기구 CAD", "드라이브 베이스 제작", "V5 Pro 코딩"],
-    wins: "우수상 (Excellence Award) & 본선 토너먼트 진출",
-    reflection: "고효율 드라이브 베이스와 흡입 메커니즘을 설계 및 제작하고 V5 Pro로 정밀 자율 루틴을 프로그래밍했습니다.",
-    description: "고효율 드라이브 베이스와 인테이크 메커니즘을 설계 및 조립하고 V5 Pro를 활용해 정밀한 자율 주행 알고리즘을 개발했습니다.",
-    image: "https://images.unsplash.com/photo-1565514020179-026b92b84bb6?auto=format&fit=crop&w=800&q=80",
-    externalLink: "https://cad.onshape.com",
-    linkText: "VEX 로봇 CAD 도면"
+    id: "fll-2024",
+    year: "2024",
+    date: "2024년 2월",
+    category: "Challenge 리그",
+    categoryType: "fll",
+    title: "First Lego League (FLL)",
+    team: "팀 리더 & 메인 빌더",
+    roles: ["미션 기구 제작", "자율주행 코딩", "혁신 프로젝트"],
+    wins: "베스트 플레이어상 (Best Player Award) & 로봇 퍼포먼스 우수",
+    reflection: "창의적인 모듈형 기구 설계와 팀원들과의 긴밀한 전략 협업으로 목표 미션을 100% 완수했습니다.",
+    description: "FLL 시즌 미션을 분석하여 다목적 미션 툴을 신속 교체할 수 있는 구조를 설계하고 자율 라인 주행을 최적화했습니다.",
+    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+    externalLink: "https://firstkorea.org",
+    linkText: "FLL 대회 정보"
   }
 ];
 
@@ -357,7 +357,7 @@ export const PROFILE_INFO: ProfileInfo = {
   email: "sjleedavid0131@gmail.com",
   location: "대한민국 서울",
   school: "중학교 로봇 & AI 트랙",
-  interests: ["자율주행 로봇", "VEX V5 Pro", "Python & C++", "CoSpace 시뮬레이션", "기구 메커니즘 CAD"],
+  interests: ["자율주행 로봇", "Pybricks 제어", "Python & C++", "CoSpace 시뮬레이션", "기구 메커니즘 CAD"],
   bio: "안녕하세요! 로봇을 직접 조립하고 자율 제어 알고리즘을 코딩하며 다양한 문제들을 기술로 해결해나가는 학생 개발자 이서진입니다. 저의 좌우명은 '언제나 열심히 노력하자'입니다.",
   avatarUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80",
   stats: [

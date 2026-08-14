@@ -18,10 +18,10 @@ export const AdminToolbar: React.FC = () => {
           <button
             onClick={openAdminAuthModal}
             className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-[#7864f6] text-slate-400 hover:text-white border border-slate-200 hover:border-[#7864f6] shadow-sm hover:shadow-md transition-all text-[11px] font-mono cursor-pointer backdrop-blur-xs"
-            title="관리자 수정 메뉴 (비밀번호: 0131)"
+            title="시스템 관리자 메뉴"
           >
             <Lock className="w-3.5 h-3.5 group-hover:text-white transition-colors" />
-            <span className="text-[10px] font-semibold tracking-wider">0131</span>
+            <span className="text-[10px] font-semibold tracking-wider">시스템</span>
           </button>
         </div>
       ) : (
@@ -33,7 +33,7 @@ export const AdminToolbar: React.FC = () => {
           <div className="flex items-center gap-2 pr-2 border-r border-slate-700">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs font-bold text-emerald-300 whitespace-nowrap hidden sm:inline">
-              수정 모드 활성화 (0131)
+              수정 모드 활성화
             </span>
           </div>
 

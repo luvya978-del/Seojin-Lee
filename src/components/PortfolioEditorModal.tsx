@@ -149,7 +149,7 @@ export const PortfolioEditorModal: React.FC = () => {
     const newProj: ProjectDetail = {
       id: `proj-${Date.now()}`,
       title: '새 로봇 프로젝트',
-      badge: 'V5 Pro',
+      badge: 'Pybricks',
       subtitle: '로봇 서브타이틀',
       description: '로봇 한 줄 요약',
       fullDescription: '로봇 상세 설명',

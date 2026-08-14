@@ -65,6 +65,66 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [editorSection, setEditorSection] = useState<string>('all');
   const [editorItem, setEditorItem] = useState<any>(null);
 
+  // Sanitize loaded data to remove obsolete VEX / CAD links
+  const sanitizeData = (raw: any): PortfolioMasterData => {
+    const rawCompetitions: CompetitionItem[] = Array.isArray(raw?.competitions) 
+      ? raw.competitions 
+      : DEFAULT_PORTFOLIO_DATA.competitions;
+
+    const cleanedCompetitions = rawCompetitions.map((comp) => {
+      // Check if external link points to CAD or mentions VEX/CAD
+      const isCadOrVexLink = 
+        Boolean(comp.externalLink?.includes('onshape') ||
+        comp.externalLink?.includes('cad') ||
+        comp.linkText?.toLowerCase().includes('cad') ||
+        comp.linkText?.toLowerCase().includes('vex'));
+
+      const cleanExternalLink = isCadOrVexLink ? undefined : comp.externalLink;
+      const cleanLinkText = isCadOrVexLink ? undefined : comp.linkText;
+
+      let title = comp.title || '';
+      let description = comp.description || '';
+      let reflection = comp.reflection || '';
+      const roles = (comp.roles || []).map((r) => r.replace(/V5\s*Pro|VEX/gi, '로봇 제어').trim());
+
+      if (title.toLowerCase().includes('vex')) {
+        title = 'First Lego League (FLL)';
+      }
+      if (description) {
+        description = description.replace(/V5\s*Pro|VEX/gi, '자율주행 시스템');
+      }
+      if (reflection) {
+        reflection = reflection.replace(/V5\s*Pro|VEX/gi, '정밀 자율주행');
+      }
+
+      return {
+        ...comp,
+        title,
+        description,
+        reflection,
+        roles,
+        externalLink: cleanExternalLink,
+        linkText: cleanLinkText
+      };
+    });
+
+    const rawHero = { ...DEFAULT_PORTFOLIO_DATA.hero, ...(raw?.hero || {}) };
+    if (rawHero.badge?.toLowerCase().includes('v5') || rawHero.badge?.toLowerCase().includes('vex')) {
+      rawHero.badge = '자율주행 / 로봇공학';
+    }
+
+    return {
+      hero: rawHero,
+      competitions: cleanedCompetitions,
+      projects: Array.isArray(raw?.projects) ? raw.projects : DEFAULT_PORTFOLIO_DATA.projects,
+      skills: Array.isArray(raw?.skills) ? raw.skills : DEFAULT_PORTFOLIO_DATA.skills,
+      awards: Array.isArray(raw?.awards) ? raw.awards : DEFAULT_PORTFOLIO_DATA.awards,
+      externalLinks: Array.isArray(raw?.externalLinks) ? raw.externalLinks : DEFAULT_PORTFOLIO_DATA.externalLinks,
+      profile: { ...DEFAULT_PORTFOLIO_DATA.profile, ...(raw?.profile || {}) },
+      updatedAt: raw?.updatedAt || new Date().toISOString()
+    };
+  };
+
   // Synchronize with Firebase Firestore
   useEffect(() => {
     const portfolioDocRef = doc(db, 'portfolio', 'data');
@@ -88,17 +148,16 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       (docSnap) => {
         if (docSnap.exists()) {
           const fetched = docSnap.data() as PortfolioMasterData;
-          // Merge with defaults to guarantee all required fields exist
-          setData({
-            hero: { ...DEFAULT_PORTFOLIO_DATA.hero, ...(fetched.hero || {}) },
-            competitions: Array.isArray(fetched.competitions) ? fetched.competitions : DEFAULT_PORTFOLIO_DATA.competitions,
-            projects: Array.isArray(fetched.projects) ? fetched.projects : DEFAULT_PORTFOLIO_DATA.projects,
-            skills: Array.isArray(fetched.skills) ? fetched.skills : DEFAULT_PORTFOLIO_DATA.skills,
-            awards: Array.isArray(fetched.awards) ? fetched.awards : DEFAULT_PORTFOLIO_DATA.awards,
-            externalLinks: Array.isArray(fetched.externalLinks) ? fetched.externalLinks : DEFAULT_PORTFOLIO_DATA.externalLinks,
-            profile: { ...DEFAULT_PORTFOLIO_DATA.profile, ...(fetched.profile || {}) },
-            updatedAt: fetched.updatedAt || new Date().toISOString()
-          });
+          const sanitized = sanitizeData(fetched);
+          setData(sanitized);
+
+          // If raw data in Firestore had stale VEX or CAD links, auto-sync back to Firestore
+          const rawStr = JSON.stringify(fetched);
+          if (rawStr.includes('cad.onshape.com') || rawStr.includes('VEX 로봇 CAD') || /v5\s*pro/i.test(rawStr)) {
+            setDoc(portfolioDocRef, sanitized).catch((err) => {
+              console.warn('Auto-sanitize Firestore sync warning:', err);
+            });
+          }
         } else {
           setData(DEFAULT_PORTFOLIO_DATA);
         }

@@ -53,10 +53,10 @@ export const Footer: React.FC = () => {
             <button
               onClick={isAdminUnlocked ? () => openEditor('all') : openAdminAuthModal}
               className="text-[10px] font-mono text-slate-400 hover:text-[#7864f6] transition-colors flex items-center gap-1 underline underline-offset-2 opacity-60 hover:opacity-100 cursor-pointer"
-              title="관리자 설정 (비번: 0131)"
+              title="시스템 관리자 설정"
             >
               <Lock className="w-2.5 h-2.5" />
-              <span>{isAdminUnlocked ? '[관리자 콘솔]' : '[시스템 0131]'}</span>
+              <span>{isAdminUnlocked ? '[관리자 콘솔]' : '[시스템]'}</span>
             </button>
           </div>
 
