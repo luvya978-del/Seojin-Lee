@@ -1,11 +1,8 @@
 import React from 'react';
 import { RobotLogoIcon } from './RobotLogo';
-import { ArrowUp, Lock, Sparkles } from 'lucide-react';
-import { usePortfolio } from '../context/PortfolioContext';
+import { ArrowUp } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { openAdminAuthModal, isAdminUnlocked, openEditor } = usePortfolio();
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -43,22 +40,11 @@ export const Footer: React.FC = () => {
 
         </div>
 
-        {/* Bottom Bar with Back to Top & Secret Admin Entry */}
+        {/* Bottom Bar with Back to Top */}
         <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div className="flex items-center gap-3">
-            <p className="flex items-center gap-1">
-              로봇공학 &amp; AI 엔지니어링을 향한 끝없는 열정
-            </p>
-            {/* Subtle discreet corner admin button */}
-            <button
-              onClick={isAdminUnlocked ? () => openEditor('all') : openAdminAuthModal}
-              className="text-[10px] font-mono text-slate-400 hover:text-[#7864f6] transition-colors flex items-center gap-1 underline underline-offset-2 opacity-60 hover:opacity-100 cursor-pointer"
-              title="시스템 관리자 설정"
-            >
-              <Lock className="w-2.5 h-2.5" />
-              <span>{isAdminUnlocked ? '[관리자 콘솔]' : '[시스템]'}</span>
-            </button>
-          </div>
+          <p className="flex items-center gap-1">
+            로봇공학 &amp; AI 엔지니어링을 향한 끝없는 열정
+          </p>
 
           <button
             onClick={scrollToTop}

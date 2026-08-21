@@ -20,15 +20,28 @@ import { CompetitionModal } from './components/CompetitionModal';
 import { AwardModal } from './components/AwardModal';
 import { HardwareSpecsModal } from './components/HardwareSpecsModal';
 import { ContactMessageModal } from './components/ContactMessageModal';
-import { AdminAuthModal } from './components/AdminAuthModal';
 import { PortfolioEditorModal } from './components/PortfolioEditorModal';
-import { AdminToolbar } from './components/AdminToolbar';
+import { AdminLoginPage } from './components/AdminLoginPage';
+import { AdminDashboard } from './components/AdminDashboard';
 import { CompetitionItem, AwardItem, ProjectDetail } from './types';
 
 function PortfolioAppContent() {
-  const { data } = usePortfolio();
+  const { data, currentRoute, isAdminUnlocked, authLoading } = usePortfolio();
 
-  // Modal states
+  // If visiting /admin route
+  if (currentRoute === '/admin') {
+    if (isAdminUnlocked) {
+      return (
+        <>
+          <AdminDashboard />
+          <PortfolioEditorModal />
+        </>
+      );
+    }
+    return <AdminLoginPage />;
+  }
+
+  // Modal states for public portfolio
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSpecsOpen, setIsSpecsOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -119,9 +132,6 @@ function PortfolioAppContent() {
         onNavigate={scrollToSection}
       />
 
-      {/* Admin Floating Control Toolbar */}
-      <AdminToolbar />
-
       {/* Modals & Dialogs */}
       <ProjectModal
         project={selectedProject}
@@ -156,10 +166,6 @@ function PortfolioAppContent() {
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />
-
-      {/* Admin Password & Content Editor Modals */}
-      <AdminAuthModal />
-      <PortfolioEditorModal />
     </div>
   );
 }

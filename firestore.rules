@@ -18,7 +18,16 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // Portfolio collection
+    // Admin and private credentials collection (Strict client-side read/write block)
+    match /admin_auth/{docId} {
+      allow read, write: if false;
+    }
+
+    match /admin_sessions/{docId} {
+      allow read, write: if false;
+    }
+
+    // Portfolio public collection
     match /portfolio/{docId} {
       allow read: if true;
       allow write: if isValidId(docId) && isValidPortfolioData(request.resource.data);

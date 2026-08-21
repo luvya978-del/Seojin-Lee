@@ -17,11 +17,18 @@ interface PortfolioContextType {
   data: PortfolioMasterData;
   loading: boolean;
   isAdminUnlocked: boolean;
+  adminUsername: string | null;
+  authLoading: boolean;
+  currentRoute: string;
   isAdminAuthModalOpen: boolean;
   isEditorOpen: boolean;
   editorSection: string;
   editorItem: any;
+  // Navigation
+  navigate: (path: string) => void;
   // Auth
+  loginAdmin: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  logoutAdmin: () => Promise<void>;
   openAdminAuthModal: () => void;
   closeAdminAuthModal: () => void;
   unlockAdmin: (password: string) => boolean;
@@ -52,18 +59,90 @@ interface PortfolioContextType {
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
 const MASTER_DOC_PATH = 'portfolio/data';
-const ADMIN_STORAGE_KEY = 'seojin_portfolio_admin_unlocked_0131';
+const ADMIN_TOKEN_KEY = 'seojin_admin_auth_token';
 
 export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<PortfolioMasterData>(DEFAULT_PORTFOLIO_DATA);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isAdminUnlocked, setIsAdminUnlocked] = useState<boolean>(() => {
-    return sessionStorage.getItem(ADMIN_STORAGE_KEY) === 'true';
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState<boolean>(false);
+  const [adminUsername, setAdminUsername] = useState<string | null>(null);
+  const [currentRoute, setCurrentRoute] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      return pathname.startsWith('/admin') ? '/admin' : '/';
+    }
+    return '/';
   });
+
   const [isAdminAuthModalOpen, setIsAdminAuthModalOpen] = useState<boolean>(false);
   const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
   const [editorSection, setEditorSection] = useState<string>('all');
   const [editorItem, setEditorItem] = useState<any>(null);
+
+  // Client-side Navigation Handler
+  const navigate = (path: string) => {
+    const targetPath = path.startsWith('/admin') ? '/admin' : '/';
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', targetPath);
+    }
+    setCurrentRoute(targetPath);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Sync with browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const pathname = window.location.pathname;
+      setCurrentRoute(pathname.startsWith('/admin') ? '/admin' : '/');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Verify and restore Admin Session on load
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+        if (!token) {
+          setIsAdminUnlocked(false);
+          setAdminUsername(null);
+          setAuthLoading(false);
+          return;
+        }
+
+        const res = await fetch('/api/admin/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (res.ok) {
+          const json = await res.json();
+          if (json.authenticated) {
+            setIsAdminUnlocked(true);
+            setAdminUsername(json.user?.username || 'david0131');
+          } else {
+            localStorage.removeItem(ADMIN_TOKEN_KEY);
+            setIsAdminUnlocked(false);
+            setAdminUsername(null);
+          }
+        } else {
+          localStorage.removeItem(ADMIN_TOKEN_KEY);
+          setIsAdminUnlocked(false);
+          setAdminUsername(null);
+        }
+      } catch (err) {
+        console.warn('Session verification fallback:', err);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+
+    checkSession();
+  }, []);
 
   // Sanitize loaded data to remove obsolete VEX / CAD links
   const sanitizeData = (raw: any): PortfolioMasterData => {
@@ -187,11 +266,68 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  // Auth methods for password "0131"
+  // Server-side login implementation
+  const loginAdmin = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success && json.token) {
+        localStorage.setItem(ADMIN_TOKEN_KEY, json.token);
+        setIsAdminUnlocked(true);
+        setAdminUsername(json.user?.username || username);
+        setIsAdminAuthModalOpen(false);
+        return { success: true };
+      } else {
+        return { success: false, error: json.error || '아이디 또는 비밀번호가 일치하지 않습니다.' };
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      // Fallback for offline / direct testing if server request fails
+      if (username.trim() === 'david0131' && (password.trim() === 'seojin0131' || password.trim() === '0131')) {
+        setIsAdminUnlocked(true);
+        setAdminUsername('david0131');
+        setIsAdminAuthModalOpen(false);
+        return { success: true };
+      }
+      return { success: false, error: '서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.' };
+    }
+  };
+
+  // Logout method
+  const logoutAdmin = async () => {
+    try {
+      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+      if (token) {
+        await fetch('/api/admin/logout', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      }
+    } catch (err) {
+      console.warn('Logout notification error:', err);
+    } finally {
+      localStorage.removeItem(ADMIN_TOKEN_KEY);
+      setIsAdminUnlocked(false);
+      setAdminUsername(null);
+      setIsEditorOpen(false);
+    }
+  };
+
+  // Auth methods for quick modal
   const unlockAdmin = (password: string): boolean => {
-    if (password.trim() === '0131') {
+    if (password.trim() === 'seojin0131' || password.trim() === '0131') {
+      loginAdmin('david0131', password.trim());
       setIsAdminUnlocked(true);
-      sessionStorage.setItem(ADMIN_STORAGE_KEY, 'true');
+      setAdminUsername('david0131');
       setIsAdminAuthModalOpen(false);
       return true;
     }
@@ -199,9 +335,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const lockAdmin = () => {
-    setIsAdminUnlocked(false);
-    sessionStorage.removeItem(ADMIN_STORAGE_KEY);
-    setIsEditorOpen(false);
+    logoutAdmin();
   };
 
   const openAdminAuthModal = () => {
@@ -328,6 +462,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         data,
         loading,
         isAdminUnlocked,
+        adminUsername,
+        authLoading,
+        currentRoute,
+        navigate,
+        loginAdmin,
+        logoutAdmin,
         isAdminAuthModalOpen,
         isEditorOpen,
         editorSection,
