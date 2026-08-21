@@ -299,7 +299,7 @@ export const AWARDS_DATA: AwardItem[] = [
     iconType: "shield",
     badgeColor: "bg-[#7864f6]/10 text-[#7864f6] border-[#7864f6]/20",
     description: "뛰어난 전략 수립, 자율 알고리즘 정밀도 및 컴퓨팅 사고력을 인정받아 전국대회 부문 은상을 수상했습니다.",
-    image: "https://images.unsplash.com/photo-1563770660941-20978e870e26?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=800&q=80",
     externalLink: "https://www.wrocontest.kr",
     linkText: "대회 결과 공지"
   },
@@ -312,7 +312,7 @@ export const AWARDS_DATA: AwardItem[] = [
     iconType: "star",
     badgeColor: "bg-[#7864f6]/10 text-[#7864f6] border-[#7864f6]/20",
     description: "철저한 엔지니어링 연구 노트와 기술 인터뷰 발표의 우수성을 인정받아 최우수 연구상을 수상했습니다.",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?auto=format&fit=crop&w=800&q=80",
     externalLink: "https://robocupkorea.org",
     linkText: "한국오픈 웹사이트"
   },
@@ -325,7 +325,7 @@ export const AWARDS_DATA: AwardItem[] = [
     iconType: "trophy",
     badgeColor: "bg-[#7864f6]/10 text-[#7864f6] border-[#7864f6]/20",
     description: "로봇 하드웨어 설계의 완성도, 신속한 트러블슈팅 및 우수한 필드 득점력을 바탕으로 우수상을 수상했습니다.",
-    image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&w=600&q=80"
+    image: "https://images.unsplash.com/photo-1589487391730-58f20eb2c308?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "award-4",
@@ -336,7 +336,7 @@ export const AWARDS_DATA: AwardItem[] = [
     iconType: "medal",
     badgeColor: "bg-[#7864f6]/10 text-[#7864f6] border-[#7864f6]/20",
     description: "모범적인 팀 리더십, 스포츠맨십 및 핵심 가치 실천을 인정받아 베스트 플레이어상을 수상했습니다.",
-    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80"
+    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "award-5",
@@ -347,7 +347,7 @@ export const AWARDS_DATA: AwardItem[] = [
     iconType: "trophy",
     badgeColor: "bg-[#7864f6]/10 text-[#7864f6] border-[#7864f6]/20",
     description: "탁월한 자율 주행 경로 탐색, 신속한 팀 프로토타이핑 및 안정적인 그리퍼 메커니즘으로 우수상을 수상했습니다.",
-    image: "https://images.unsplash.com/photo-1565514020179-026b92b84bb6?auto=format&fit=crop&w=600&q=80"
+    image: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80"
   }
 ];
 

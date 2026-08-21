@@ -43,6 +43,24 @@ export const CompetitionModal: React.FC<CompetitionModalProps> = ({ item, onClos
 
         {/* Body */}
         <div className="p-6 overflow-y-auto space-y-5 bg-white">
+          {/* Competition Photo */}
+          {item.image && (
+            <div className="h-52 sm:h-60 w-full rounded-2xl overflow-hidden bg-slate-100 relative shadow-inner border border-slate-200">
+              <img
+                src={item.image}
+                alt={item.title}
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80";
+                }}
+              />
+              <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-xs text-[10px] text-white font-mono font-medium">
+                대회 현장 기록 사진
+              </div>
+            </div>
+          )}
+
           {/* Wins Banner */}
           <div className="p-4 rounded-2xl bg-white border border-[#7864f6]/20 flex items-start gap-3">
             <Trophy className="w-5 h-5 text-[#7864f6] shrink-0 mt-0.5" />

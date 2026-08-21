@@ -41,7 +41,25 @@ export const AwardModal: React.FC<AwardModalProps> = ({ award, onClose }) => {
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4 bg-white">
+        <div className="p-6 space-y-4 bg-white max-h-[60vh] overflow-y-auto">
+          {/* Certificate / Award Photo */}
+          {award.image && (
+            <div className="w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-slate-100 relative border border-slate-200 shadow-inner">
+              <img
+                src={award.image}
+                alt={award.title}
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=800&q=80";
+                }}
+              />
+              <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-xs text-[10px] text-white font-mono font-medium">
+                공식 상장 및 인증 사진
+              </div>
+            </div>
+          )}
+
           <div className="p-4 rounded-2xl bg-white border border-[#7864f6]/20 text-xs sm:text-sm text-slate-700 leading-relaxed">
             {award.description || '탁월한 기술적 완성도, 자율주행 알고리즘의 정밀성 및 로봇 공학적 창의성을 인정받아 수상하였습니다.'}
           </div>

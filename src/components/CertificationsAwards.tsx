@@ -129,14 +129,33 @@ export const CertificationsAwards: React.FC<CertificationsAwardsProps> = ({ onSe
                 onClick={(e) => triggerConfetti(e, award)}
                 className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-white hover:shadow-md border border-slate-200/80 hover:border-[#7864f6] transition-all duration-200 cursor-pointer group"
               >
-                {/* Left Side: Icon & Titles */}
-                <div className="flex items-center gap-4 min-w-0">
-                  {getAwardIcon(award.iconType)}
+                {/* Left Side: Photo/Icon & Titles */}
+                <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                  {award.image ? (
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 relative group-hover:border-[#7864f6]/50 transition-colors">
+                      <img
+                        src={award.image}
+                        alt={award.title}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=800&q=80";
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    getAwardIcon(award.iconType)
+                  )}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <h4 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#7864f6] transition-colors font-['Outfit'] truncate">
                         {award.title}
                       </h4>
+                      {award.image && (
+                        <span className="hidden sm:inline-flex items-center text-[10px] font-mono text-[#7864f6] bg-[#7864f6]/10 px-1.5 py-0.5 rounded font-semibold">
+                          인증 사진
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs sm:text-sm text-slate-500 font-medium">
                       {award.subtitle}

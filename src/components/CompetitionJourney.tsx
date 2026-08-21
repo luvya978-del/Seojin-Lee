@@ -143,9 +143,33 @@ export const CompetitionJourney: React.FC<CompetitionJourneyProps> = ({ onSelect
                       </h3>
 
                       {/* Team Name */}
-                      <div className="text-xs sm:text-sm font-bold text-[#7864f6] mt-1 mb-4 font-['Outfit']">
+                      <div className="text-xs sm:text-sm font-bold text-[#7864f6] mt-1 mb-3 font-['Outfit']">
                         {comp.team}
                       </div>
+
+                      {/* Photo Visual Preview */}
+                      {comp.image && (
+                        <div className="mb-4 h-48 sm:h-56 w-full rounded-xl overflow-hidden bg-slate-100 relative group/img border border-slate-200/80">
+                          <img
+                            src={comp.image}
+                            alt={comp.title}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80";
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity" />
+                          <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-[11px] font-mono font-medium">
+                            <span className="flex items-center gap-1.5 bg-black/50 backdrop-blur-xs px-2 py-0.5 rounded-md">
+                              📸 대회 현장 &amp; 로봇 사진
+                            </span>
+                            <span className="bg-[#7864f6]/90 backdrop-blur-xs px-2 py-0.5 rounded-md text-white font-bold text-[10px]">
+                              {comp.category}
+                            </span>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Roles */}
                       <div className="mb-4">

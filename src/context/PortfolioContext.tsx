@@ -166,11 +166,14 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     checkSession();
   }, []);
 
-  // Sanitize loaded data to remove obsolete VEX / CAD links
+  // Sanitize loaded data to remove obsolete VEX / CAD links and guarantee images
   const sanitizeData = (raw: any): PortfolioMasterData => {
     const rawCompetitions: CompetitionItem[] = Array.isArray(raw?.competitions) 
       ? raw.competitions 
       : DEFAULT_PORTFOLIO_DATA.competitions;
+
+    const defaultCompMap = new Map(DEFAULT_PORTFOLIO_DATA.competitions.map(c => [c.id, c.image]));
+    const defaultAwardMap = new Map(DEFAULT_PORTFOLIO_DATA.awards.map(a => [a.id, a.image]));
 
     const cleanedCompetitions = rawCompetitions.map((comp) => {
       // Check if external link points to CAD or mentions VEX/CAD
@@ -198,12 +201,17 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         reflection = reflection.replace(/V5\s*Pro|VEX/gi, '정밀 자율주행');
       }
 
+      // Ensure valid image
+      const fallbackImg = defaultCompMap.get(comp.id) || "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80";
+      const image = (comp.image && comp.image.trim() !== '') ? comp.image : fallbackImg;
+
       const item: CompetitionItem = {
         ...comp,
         title,
         description,
         reflection,
-        roles
+        roles,
+        image
       };
 
       if (cleanExternalLink) {
@@ -221,6 +229,19 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return item;
     });
 
+    const rawAwards: AwardItem[] = Array.isArray(raw?.awards)
+      ? raw.awards
+      : DEFAULT_PORTFOLIO_DATA.awards;
+
+    const cleanedAwards = rawAwards.map((award) => {
+      const fallbackAwardImg = defaultAwardMap.get(award.id) || "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=800&q=80";
+      const image = (award.image && award.image.trim() !== '') ? award.image : fallbackAwardImg;
+      return {
+        ...award,
+        image
+      };
+    });
+
     const rawHero = { ...DEFAULT_PORTFOLIO_DATA.hero, ...(raw?.hero || {}) };
     if (rawHero.badge?.toLowerCase().includes('v5') || rawHero.badge?.toLowerCase().includes('vex')) {
       rawHero.badge = '자율주행 / 로봇공학';
@@ -231,7 +252,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       competitions: cleanedCompetitions,
       projects: Array.isArray(raw?.projects) ? raw.projects : DEFAULT_PORTFOLIO_DATA.projects,
       skills: Array.isArray(raw?.skills) ? raw.skills : DEFAULT_PORTFOLIO_DATA.skills,
-      awards: Array.isArray(raw?.awards) ? raw.awards : DEFAULT_PORTFOLIO_DATA.awards,
+      awards: cleanedAwards,
       externalLinks: Array.isArray(raw?.externalLinks) ? raw.externalLinks : DEFAULT_PORTFOLIO_DATA.externalLinks,
       profile: { ...DEFAULT_PORTFOLIO_DATA.profile, ...(raw?.profile || {}) },
       updatedAt: raw?.updatedAt || new Date().toISOString()
