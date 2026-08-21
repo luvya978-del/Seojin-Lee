@@ -34,8 +34,8 @@ const DEFAULT_PRESETS = [
   'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=1200&q=80'  // Trophy / Award
 ];
 
-// Helper: compress image file using canvas to keep Firestore document size small & fast
-async function compressImageFile(file: File, maxDim = 1280, quality = 0.82): Promise<string> {
+// Helper: compress image file using canvas to keep size tiny and fast
+async function compressImageFile(file: File, maxDim = 960, quality = 0.75): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -66,6 +66,9 @@ async function compressImageFile(file: File, maxDim = 1280, quality = 0.82): Pro
           return;
         }
 
+        // Draw with high quality smoothing
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
         // Convert to webp if supported, else jpeg
@@ -86,6 +89,26 @@ async function compressImageFile(file: File, maxDim = 1280, quality = 0.82): Pro
     reader.onerror = () => reject(new Error('파일 읽기 오류'));
     reader.readAsDataURL(file);
   });
+}
+
+// Uploads image to server backend and returns light URL (/api/uploads/...)
+async function uploadImageToServer(dataUrl: string, filename: string): Promise<string> {
+  try {
+    const res = await fetch('/api/upload-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataUrl, filename })
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.url) {
+        return json.url;
+      }
+    }
+  } catch (err) {
+    console.warn('Server upload unavailable, fallback to compressed data URL:', err);
+  }
+  return dataUrl;
 }
 
 export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
@@ -120,12 +143,14 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
 
     setIsCompressing(true);
     try {
-      const dataUrl = await compressImageFile(file);
-      onChange(dataUrl);
+      const compressedDataUrl = await compressImageFile(file, 960, 0.75);
+      const finalUrl = await uploadImageToServer(compressedDataUrl, file.name);
+      onChange(finalUrl);
+      setInputUrl(finalUrl);
       setImgError(false);
     } catch (err) {
       console.error('Image processing failed:', err);
-      alert('이미지 압축 및 변환에 실패했습니다.');
+      alert('이미지 업로드 및 변환에 실패했습니다.');
     } finally {
       setIsCompressing(false);
     }

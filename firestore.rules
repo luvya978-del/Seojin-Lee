@@ -32,5 +32,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isValidId(docId) && isValidPortfolioData(request.resource.data);
     }
+
+    // Portfolio individual images collection for offloading large media
+    match /portfolio_images/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId);
+    }
   }
 }

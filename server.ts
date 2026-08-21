@@ -23,15 +23,19 @@ interface AdminSession {
 // In-memory session store & database persistence
 const SESSIONS = new Map<string, AdminSession>();
 const DATA_DIR = path.join(process.cwd(), 'data');
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 const ADMIN_DB_PATH = path.join(DATA_DIR, 'admin_credentials.json');
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  try {
+// Ensure data & uploads directory exists
+try {
+  if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
-  } catch (err) {
-    console.warn('Could not create data directory:', err);
   }
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.warn('Could not create data/uploads directory:', err);
 }
 
 // Password hashing utilities using PBKDF2 (SHA-512, 100,000 iterations)
@@ -280,6 +284,63 @@ async function startServer() {
       message: '비밀번호가 성공적으로 변경되었습니다.'
     });
   });
+
+  // Image Upload API (Saves image to data/uploads and returns public lightweight URL)
+  app.post('/api/upload-image', (req, res) => {
+    try {
+      const { dataUrl, filename } = req.body || {};
+
+      if (!dataUrl || typeof dataUrl !== 'string') {
+        res.status(400).json({ success: false, error: '유효한 이미지 데이터가 전달되지 않았습니다.' });
+        return;
+      }
+
+      // Check if it is a base64 data URL
+      const matches = dataUrl.match(/^data:image\/([a-zA-Z0-9\+\-\.]+);base64,(.+)$/);
+      if (!matches) {
+        // If it's already an HTTP URL, return as-is
+        if (dataUrl.startsWith('http://') || dataUrl.startsWith('https://') || dataUrl.startsWith('/api/uploads/')) {
+          res.json({ success: true, url: dataUrl });
+          return;
+        }
+        res.status(400).json({ success: false, error: '지원되지 않는 이미지 포맷입니다.' });
+        return;
+      }
+
+      const rawExt = matches[1].toLowerCase();
+      const ext = rawExt === 'jpeg' ? 'jpg' : (rawExt === 'svg+xml' ? 'svg' : rawExt);
+      const base64Data = matches[2];
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      // Generate a unique safe filename
+      const safePrefix = (filename || 'portfolio_img')
+        .replace(/[^a-zA-Z0-9_-]/g, '_')
+        .slice(0, 30);
+      const fileId = `img_${Date.now()}_${crypto.randomBytes(4).toString('hex')}_${safePrefix}.${ext}`;
+      const filePath = path.join(UPLOADS_DIR, fileId);
+
+      fs.writeFileSync(filePath, buffer);
+
+      const publicUrl = `/api/uploads/${fileId}`;
+      res.json({
+        success: true,
+        url: publicUrl,
+        size: buffer.length
+      });
+    } catch (err: any) {
+      console.error('Image upload failed:', err);
+      res.status(500).json({
+        success: false,
+        error: '이미지 저장 중 서버 오류가 발생했습니다.'
+      });
+    }
+  });
+
+  // Serve uploaded images statically
+  app.use('/api/uploads', express.static(UPLOADS_DIR, {
+    maxAge: '30d',
+    immutable: true
+  }));
 
   // Vite Middleware for development vs Static Serving in production
   if (process.env.NODE_ENV !== 'production') {

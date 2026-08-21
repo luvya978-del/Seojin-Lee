@@ -83,6 +83,85 @@ function cleanForFirestore<T>(input: T): T {
   return input;
 }
 
+// Offloads base64 data URLs to server uploads API or separate Firestore image docs
+async function offloadDataUrlToBackend(val: string | undefined, prefix: string): Promise<string> {
+  if (!val || typeof val !== 'string') return val || '';
+  if (!val.startsWith('data:image/')) return val;
+
+  // 1. Try server image upload API
+  try {
+    const res = await fetch('/api/upload-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataUrl: val, filename: prefix })
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.url) {
+        return json.url;
+      }
+    }
+  } catch (e) {
+    console.warn('Server upload offload fallback:', e);
+  }
+
+  // 2. Fallback: Store in separate Firestore collection to keep master document under 1MB limit
+  try {
+    const mediaDocId = `media_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    await setDoc(doc(db, 'portfolio_images', mediaDocId), {
+      dataUrl: val,
+      createdAt: new Date().toISOString()
+    });
+  } catch (err) {
+    console.warn('Portfolio image collection write warning:', err);
+  }
+
+  return val;
+}
+
+// Recursively processes all portfolio fields to offload base64 images
+async function processAndOffloadPortfolioImages(input: PortfolioMasterData): Promise<PortfolioMasterData> {
+  const cloned: PortfolioMasterData = JSON.parse(JSON.stringify(input));
+
+  if (cloned.hero) {
+    cloned.hero.heroImage = await offloadDataUrlToBackend(cloned.hero.heroImage, 'hero_main');
+    cloned.hero.secondaryHeroImage = await offloadDataUrlToBackend(cloned.hero.secondaryHeroImage, 'hero_sub');
+  }
+
+  if (cloned.competitions && Array.isArray(cloned.competitions)) {
+    for (let i = 0; i < cloned.competitions.length; i++) {
+      const c = cloned.competitions[i];
+      if (c.image) {
+        c.image = await offloadDataUrlToBackend(c.image, `comp_${c.id || i}`);
+      }
+    }
+  }
+
+  if (cloned.projects && Array.isArray(cloned.projects)) {
+    for (let i = 0; i < cloned.projects.length; i++) {
+      const p = cloned.projects[i];
+      if (p.image) {
+        p.image = await offloadDataUrlToBackend(p.image, `proj_${p.id || i}`);
+      }
+    }
+  }
+
+  if (cloned.awards && Array.isArray(cloned.awards)) {
+    for (let i = 0; i < cloned.awards.length; i++) {
+      const a = cloned.awards[i];
+      if (a.image) {
+        a.image = await offloadDataUrlToBackend(a.image, `award_${a.id || i}`);
+      }
+    }
+  }
+
+  if (cloned.profile) {
+    cloned.profile.avatarUrl = await offloadDataUrlToBackend(cloned.profile.avatarUrl, 'profile_avatar');
+  }
+
+  return cloned;
+}
+
 export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<PortfolioMasterData>(DEFAULT_PORTFOLIO_DATA);
   const [loading, setLoading] = useState<boolean>(true);
@@ -285,11 +364,18 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           const sanitized = sanitizeData(fetched);
           setData(sanitized);
 
-          // If raw data in Firestore had stale VEX or CAD links, auto-sync back to Firestore
+          // If raw data in Firestore had huge base64 strings or stale VEX/CAD links, auto-offload to server/collection
           const rawStr = JSON.stringify(fetched);
-          if (rawStr.includes('cad.onshape.com') || rawStr.includes('VEX 로봇 CAD') || /v5\s*pro/i.test(rawStr)) {
-            setDoc(portfolioDocRef, cleanForFirestore(sanitized)).catch((err) => {
-              console.warn('Auto-sanitize Firestore sync warning:', err);
+          const hasLargeImages = rawStr.includes('data:image/') || rawStr.length > 500000;
+          const hasStaleVex = rawStr.includes('cad.onshape.com') || rawStr.includes('VEX 로봇 CAD') || /v5\s*pro/i.test(rawStr);
+
+          if (hasLargeImages || hasStaleVex) {
+            processAndOffloadPortfolioImages(sanitized).then((cleanPayload) => {
+              setDoc(portfolioDocRef, cleanForFirestore(cleanPayload)).catch((err) => {
+                console.warn('Auto-sanitize Firestore sync warning:', err);
+              });
+            }).catch((err) => {
+              console.warn('Image offload error during sync:', err);
             });
           }
         } else {
@@ -309,8 +395,11 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Save changes to Firestore
   const updatePortfolio = async (newData: PortfolioMasterData) => {
     try {
+      // 1. Automatically offload any base64 image strings to server upload directory or separate collection
+      const offloaded = await processAndOffloadPortfolioImages(newData);
+
       const sanitizedData: PortfolioMasterData = {
-        ...newData,
+        ...offloaded,
         updatedAt: new Date().toISOString()
       };
       setData(sanitizedData);
