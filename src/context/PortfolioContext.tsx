@@ -61,6 +61,28 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 const MASTER_DOC_PATH = 'portfolio/data';
 const ADMIN_TOKEN_KEY = 'seojin_admin_auth_token';
 
+// Recursively remove any `undefined` values from an object or array so Firestore never throws unsupported field value error
+function cleanForFirestore<T>(input: T): T {
+  if (input === null || input === undefined) {
+    return null as any;
+  }
+  if (Array.isArray(input)) {
+    return input
+      .filter((item) => item !== undefined)
+      .map((item) => cleanForFirestore(item)) as any;
+  }
+  if (typeof input === 'object' && !(input instanceof Date)) {
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(input as Record<string, any>)) {
+      if (value !== undefined) {
+        cleaned[key] = cleanForFirestore(value);
+      }
+    }
+    return cleaned as T;
+  }
+  return input;
+}
+
 export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<PortfolioMasterData>(DEFAULT_PORTFOLIO_DATA);
   const [loading, setLoading] = useState<boolean>(true);
@@ -158,8 +180,8 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         comp.linkText?.toLowerCase().includes('cad') ||
         comp.linkText?.toLowerCase().includes('vex'));
 
-      const cleanExternalLink = isCadOrVexLink ? undefined : comp.externalLink;
-      const cleanLinkText = isCadOrVexLink ? undefined : comp.linkText;
+      const cleanExternalLink = isCadOrVexLink ? '' : (comp.externalLink || '');
+      const cleanLinkText = isCadOrVexLink ? '' : (comp.linkText || '');
 
       let title = comp.title || '';
       let description = comp.description || '';
@@ -176,15 +198,27 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         reflection = reflection.replace(/V5\s*Pro|VEX/gi, '정밀 자율주행');
       }
 
-      return {
+      const item: CompetitionItem = {
         ...comp,
         title,
         description,
         reflection,
-        roles,
-        externalLink: cleanExternalLink,
-        linkText: cleanLinkText
+        roles
       };
+
+      if (cleanExternalLink) {
+        item.externalLink = cleanExternalLink;
+      } else {
+        delete item.externalLink;
+      }
+
+      if (cleanLinkText) {
+        item.linkText = cleanLinkText;
+      } else {
+        delete item.linkText;
+      }
+
+      return item;
     });
 
     const rawHero = { ...DEFAULT_PORTFOLIO_DATA.hero, ...(raw?.hero || {}) };
@@ -212,7 +246,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     getDoc(portfolioDocRef)
       .then((snap) => {
         if (!snap.exists()) {
-          setDoc(portfolioDocRef, DEFAULT_PORTFOLIO_DATA).catch((err) => {
+          setDoc(portfolioDocRef, cleanForFirestore(DEFAULT_PORTFOLIO_DATA)).catch((err) => {
             console.warn('Initial Firestore seed warning:', err);
           });
         }
@@ -233,7 +267,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           // If raw data in Firestore had stale VEX or CAD links, auto-sync back to Firestore
           const rawStr = JSON.stringify(fetched);
           if (rawStr.includes('cad.onshape.com') || rawStr.includes('VEX 로봇 CAD') || /v5\s*pro/i.test(rawStr)) {
-            setDoc(portfolioDocRef, sanitized).catch((err) => {
+            setDoc(portfolioDocRef, cleanForFirestore(sanitized)).catch((err) => {
               console.warn('Auto-sanitize Firestore sync warning:', err);
             });
           }
@@ -260,9 +294,11 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       };
       setData(sanitizedData);
       const portfolioDocRef = doc(db, 'portfolio', 'data');
-      await setDoc(portfolioDocRef, sanitizedData);
+      await setDoc(portfolioDocRef, cleanForFirestore(sanitizedData));
     } catch (error) {
+      console.error('Firestore save error:', error);
       handleFirestoreError(error, OperationType.WRITE, MASTER_DOC_PATH);
+      throw error;
     }
   };
 
