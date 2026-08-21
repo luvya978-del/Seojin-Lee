@@ -20,7 +20,8 @@ import {
   Layers, 
   ArrowUpRight,
   Eye,
-  Sliders
+  Sliders,
+  Image as ImageIcon
 } from 'lucide-react';
 import { CompetitionItem, AwardItem, ProjectDetail, ExternalLinkItem } from '../types';
 
@@ -199,15 +200,37 @@ export const AdminDashboard: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold font-['Outfit'] text-[#9b8afb] uppercase tracking-wider">
-                      히어로 헤더 설정
+                      히어로 헤더 &amp; 대표 사진
                     </span>
                     <button
                       onClick={() => openEditor('hero')}
                       className="text-xs text-[#7864f6] hover:text-[#9b8afb] font-bold flex items-center gap-1 cursor-pointer"
                     >
-                      <Edit3 className="w-3.5 h-3.5" /> 수정
+                      <Edit3 className="w-3.5 h-3.5" /> 사진/정보 수정
                     </button>
                   </div>
+
+                  {data.hero?.heroImage && (
+                    <div 
+                      onClick={() => openEditor('hero')}
+                      className="mb-3 h-32 rounded-xl overflow-hidden bg-slate-800 relative cursor-pointer group"
+                    >
+                      <img 
+                        src={data.hero.heroImage} 
+                        alt="Hero" 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2.5">
+                        <span className="text-[11px] text-slate-200 font-mono flex items-center gap-1">
+                          <ImageIcon className="w-3 h-3 text-[#7864f6]" /> 메인 대표 사진
+                        </span>
+                      </div>
+                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/70 text-[10px] text-white font-mono flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Edit3 className="w-2.5 h-2.5" /> 사진 변경
+                      </div>
+                    </div>
+                  )}
+
                   <h3 className="text-lg font-bold text-white mb-2">
                     {data.hero?.name} {data.hero?.titleSuffix}
                   </h3>
@@ -337,6 +360,23 @@ export const AdminDashboard: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Image Thumbnail preview */}
+                    {comp.image && (
+                      <div 
+                        onClick={() => openEditor('competitions', comp)}
+                        className="mb-3 h-28 rounded-xl overflow-hidden bg-slate-800 relative cursor-pointer group"
+                      >
+                        <img 
+                          src={comp.image} 
+                          alt={comp.title} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                        />
+                        <div className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-md bg-black/70 text-[10px] text-white font-mono flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Edit3 className="w-2.5 h-2.5" /> 사진 변경
+                        </div>
+                      </div>
+                    )}
+
                     <p className="text-xs text-emerald-400 font-semibold mb-2">
                       🏆 {comp.wins}
                     </p>
@@ -409,6 +449,23 @@ export const AdminDashboard: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Project Image Thumbnail preview */}
+                    {proj.image && (
+                      <div 
+                        onClick={() => openEditor('projects', proj)}
+                        className="mb-3 h-28 rounded-xl overflow-hidden bg-slate-800 relative cursor-pointer group"
+                      >
+                        <img 
+                          src={proj.image} 
+                          alt={proj.title} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                        />
+                        <div className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-md bg-black/70 text-[10px] text-white font-mono flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Edit3 className="w-2.5 h-2.5" /> 사진 변경
+                        </div>
+                      </div>
+                    )}
+
                     <p className="text-xs text-slate-400 line-clamp-2">
                       {proj.description}
                     </p>
@@ -477,6 +534,23 @@ export const AdminDashboard: React.FC = () => {
                         </button>
                       </div>
                     </div>
+
+                    {/* Award Image Thumbnail preview */}
+                    {award.image && (
+                      <div 
+                        onClick={() => openEditor('awards', award)}
+                        className="mb-3 h-28 rounded-xl overflow-hidden bg-slate-800 relative cursor-pointer group"
+                      >
+                        <img 
+                          src={award.image} 
+                          alt={award.title} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                        />
+                        <div className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-md bg-black/70 text-[10px] text-white font-mono flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Edit3 className="w-2.5 h-2.5" /> 사진 변경
+                        </div>
+                      </div>
+                    )}
 
                     <p className="text-xs text-slate-400 line-clamp-2">
                       {award.description}

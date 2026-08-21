@@ -27,6 +27,7 @@ import {
   HeroData, 
   ProfileInfo 
 } from '../types';
+import { ImageUploadInput } from './ImageUploadInput';
 
 export const PortfolioEditorModal: React.FC = () => {
   const { 
@@ -421,53 +422,25 @@ export const PortfolioEditorModal: React.FC = () => {
                 히어로 섹션 및 대표 이미지 편집
               </h4>
 
-              {/* Image Previews & URLs */}
+              {/* Image Upload Inputs */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl border border-slate-200 space-y-3 bg-white">
-                  <div className="font-bold text-xs text-slate-700 uppercase flex items-center justify-between">
-                    <span>메인 히어로 로봇 이미지</span>
-                    <span className="text-[10px] text-[#7864f6] font-mono">권장 1200x800</span>
-                  </div>
-                  <div className="h-40 rounded-xl overflow-hidden bg-slate-100 relative">
-                    <img
-                      src={formData.hero.heroImage}
-                      alt="Hero Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-500">이미지 URL 주소</label>
-                    <input
-                      type="url"
-                      value={formData.hero.heroImage}
-                      onChange={(e) => handleHeroChange('heroImage', e.target.value)}
-                      className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono focus:outline-none focus:border-[#7864f6]"
-                    />
-                  </div>
-                </div>
+                <ImageUploadInput
+                  label="메인 히어로 로봇 사진"
+                  value={formData.hero.heroImage}
+                  onChange={(val) => handleHeroChange('heroImage', val)}
+                  aspectRatio="video"
+                  recommendedSize="1200x800 이상 (16:9)"
+                  helperText="홈페이지 최상단 대표 비주얼로 표시됩니다. 내 사진 파일 업로드 또는 URL 입력이 가능합니다."
+                />
 
-                <div className="p-4 rounded-2xl border border-slate-200 space-y-3 bg-white">
-                  <div className="font-bold text-xs text-slate-700 uppercase flex items-center justify-between">
-                    <span>보조 히어로 이미지</span>
-                    <span className="text-[10px] text-[#7864f6] font-mono">권장 800x600</span>
-                  </div>
-                  <div className="h-40 rounded-xl overflow-hidden bg-slate-100 relative">
-                    <img
-                      src={formData.hero.secondaryHeroImage}
-                      alt="Secondary Hero Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-500">보조 이미지 URL 주소</label>
-                    <input
-                      type="url"
-                      value={formData.hero.secondaryHeroImage}
-                      onChange={(e) => handleHeroChange('secondaryHeroImage', e.target.value)}
-                      className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono focus:outline-none focus:border-[#7864f6]"
-                    />
-                  </div>
-                </div>
+                <ImageUploadInput
+                  label="보조 히어로 로봇 그래픽"
+                  value={formData.hero.secondaryHeroImage}
+                  onChange={(val) => handleHeroChange('secondaryHeroImage', val)}
+                  aspectRatio="video"
+                  recommendedSize="800x600 권장"
+                  helperText="헤더 서브 카드 및 모바일 뷰 비주얼에 활용됩니다."
+                />
               </div>
 
               {/* Text Fields */}
@@ -594,19 +567,18 @@ export const PortfolioEditorModal: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-3">
+                      <ImageUploadInput
+                        label="대회 현장 및 로봇 사진"
+                        value={comp.image || ''}
+                        onChange={(val) => handleUpdateCompetition(comp.id, 'image', val)}
+                        aspectRatio="video"
+                        recommendedSize="800x500 권장"
+                        helperText="대회 경기 현장, 로봇 제작 과정 또는 수상 기념 사진을 등록합니다."
+                      />
+
                       <div>
-                        <label className="text-[11px] font-bold text-slate-500">대회 사진 이미지 URL</label>
-                        <input
-                          type="url"
-                          value={comp.image || ''}
-                          onChange={(e) => handleUpdateCompetition(comp.id, 'image', e.target.value)}
-                          placeholder="https://images.unsplash.com/..."
-                          className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-slate-500">대회 영상 / 외부 링크 URL</label>
+                        <label className="text-[11px] font-bold text-slate-500">대회 영상 / 외부 링크 URL (유튜브 등)</label>
                         <input
                           type="url"
                           value={comp.externalLink || ''}
@@ -712,18 +684,18 @@ export const PortfolioEditorModal: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-3">
+                      <ImageUploadInput
+                        label="프로젝트 및 기구 사진"
+                        value={proj.image || ''}
+                        onChange={(val) => handleUpdateProject(proj.id, 'image', val)}
+                        aspectRatio="video"
+                        recommendedSize="900x600 권장"
+                        helperText="로봇 완성체, 3D CAD 렌더링 샷, 회로 기판 등의 사진을 등록합니다."
+                      />
+
                       <div>
-                        <label className="text-[11px] font-bold text-slate-500">메인 로봇 이미지 URL</label>
-                        <input
-                          type="url"
-                          value={proj.image}
-                          onChange={(e) => handleUpdateProject(proj.id, 'image', e.target.value)}
-                          className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-slate-500">외부 CAD / GitHub 링크 URL</label>
+                        <label className="text-[11px] font-bold text-slate-500">외부 CAD / GitHub 링크 URL (Onshape, GitHub 등)</label>
                         <input
                           type="url"
                           value={proj.externalLink || ''}
@@ -876,19 +848,18 @@ export const PortfolioEditorModal: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="space-y-3">
+                      <ImageUploadInput
+                        label="상장 및 인증서 사진"
+                        value={awd.image || ''}
+                        onChange={(val) => handleUpdateAward(awd.id, 'image', val)}
+                        aspectRatio="video"
+                        recommendedSize="800x600 권장"
+                        helperText="공식 상장, 인증서, 트로피 사진을 등록합니다."
+                      />
+
                       <div>
-                        <label className="text-[11px] font-bold text-slate-500">상장/인증 이미지 URL</label>
-                        <input
-                          type="url"
-                          value={awd.image || ''}
-                          onChange={(e) => handleUpdateAward(awd.id, 'image', e.target.value)}
-                          placeholder="https://..."
-                          className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-slate-500">공식 웹사이트 / 외부 링크</label>
+                        <label className="text-[11px] font-bold text-slate-500">공식 웹사이트 / 외부 링크 (대회 주최측 공지 등)</label>
                         <input
                           type="url"
                           value={awd.externalLink || ''}
@@ -912,7 +883,17 @@ export const PortfolioEditorModal: React.FC = () => {
                 프로필 및 소개 정보 편집
               </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                <ImageUploadInput
+                  label="프로필 사진 (아바타)"
+                  value={formData.profile.avatarUrl || ''}
+                  onChange={(val) => setFormData(prev => ({ ...prev, profile: { ...prev.profile, avatarUrl: val } }))}
+                  aspectRatio="square"
+                  recommendedSize="400x400 (정사각형)"
+                  helperText="개발자 프로필 및 관리자 헤더에 사용될 본인 사진을 등록합니다."
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold text-slate-600 uppercase">이름</label>
                   <input
@@ -960,7 +941,8 @@ export const PortfolioEditorModal: React.FC = () => {
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
         </div>
 
