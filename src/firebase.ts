@@ -34,7 +34,13 @@ export interface FirestoreErrorInfo {
   };
 }
 
-export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): FirestoreErrorInfo {
+  const isQuotaExceeded = error instanceof Error && (
+    error.message.includes('resource-exhausted') || 
+    error.message.includes('Quota exceeded') ||
+    error.message.includes('quota')
+  );
+
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
@@ -51,8 +57,14 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     operationType,
     path
   };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+
+  if (isQuotaExceeded) {
+    console.warn('Firestore Free Tier Daily Quota reached. Falling back to local storage and cached state.');
+  } else {
+    console.warn('Firestore notification: ', JSON.stringify(errInfo));
+  }
+
+  return errInfo;
 }
 
 // Test connection on boot

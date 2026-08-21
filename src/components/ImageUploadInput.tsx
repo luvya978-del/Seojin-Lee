@@ -34,8 +34,8 @@ const DEFAULT_PRESETS = [
   'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=1200&q=80'  // Trophy / Award
 ];
 
-// Helper: compress image file using canvas to keep size tiny and fast
-async function compressImageFile(file: File, maxDim = 960, quality = 0.75): Promise<string> {
+// Helper: compress image file using canvas to keep size tiny (~20KB) and fast
+async function compressImageFile(file: File, maxDim = 800, quality = 0.70): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -91,7 +91,7 @@ async function compressImageFile(file: File, maxDim = 960, quality = 0.75): Prom
   });
 }
 
-// Uploads image to server backend and returns light URL (/api/uploads/...)
+// Uploads image to server backend if available, otherwise returns compressed data URL
 async function uploadImageToServer(dataUrl: string, filename: string): Promise<string> {
   try {
     const res = await fetch('/api/upload-image', {
@@ -101,12 +101,12 @@ async function uploadImageToServer(dataUrl: string, filename: string): Promise<s
     });
     if (res.ok) {
       const json = await res.json();
-      if (json.success && json.url) {
+      if (json?.success && json?.url) {
         return json.url;
       }
     }
-  } catch (err) {
-    console.warn('Server upload unavailable, fallback to compressed data URL:', err);
+  } catch (_) {
+    // Backend upload endpoint not available (e.g. static Vercel host); retain compressed data URL
   }
   return dataUrl;
 }
